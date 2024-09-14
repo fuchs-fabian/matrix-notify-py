@@ -1,163 +1,183 @@
-# matrix-notify-py
+# `matrix-notify-py`: Simple Python script for sending HTML messages to a Matrix room, optionally with E2E
+
+<p align="center">
+  <a href="./LICENSE">
+    <img alt="GPL-3.0 License" src="https://img.shields.io/badge/GitHub-GPL--3.0-informational">
+  </a>
+</p>
+
+<div align="center">
+  <table>
+    <tr>
+      <td>
+        <a href="https://github.com/fuchs-fabian/matrix-notify-py">
+          <img src="https://github-readme-stats.vercel.app/api/pin/?username=fuchs-fabian&repo=matrix-notify-py&theme=holi&hide_border=true&border_radius=10" alt="Repository matrix-notify-py"/>
+        </a>
+      </td>
+    </tr>
+  </table>
+</div>
+
+## Description
 
 Simple Python script for sending HTML messages to a [Matrix](https://matrix.org/) room, optionally with E2E.
 
-It took some time to find a good solution for sending encrypted messages to Matrix in a simple and uncomplicated way. I have therefore endeavoured to document everything as well as possible.
+By importing this package, you can focus solely on the logic without worrying how to handle the notifier logic.
 
-If you have any suggestions for improvement or ideas, I would be very grateful if you would simply create an issue or open a PR with your proposed solution.
+## Getting Started
 
-You are welcome to use this template and adapt it to your needs.
+> It is possible that `pip` is not yet installed. If this is not the case, you will be prompted to install it. Confirm the installation.
 
-To get it:
-
-```bash
-wget https://raw.githubusercontent.com/fuchs-fabian/matrix-notify-py/main/matrix.py
-```
-
-Make the script executable if required:
+### Installation with `pip` (GitHub)
 
 ```bash
-chmod +x ./matrix.py
+pip install git+https://github.com/fuchs-fabian/matrix-notify-py.git
 ```
 
-## Preparations
+### Installation with `pip` (Local)
 
-> Create a special (bot) user / account! Don't use your main account!
-
-Installing required packages:
+Download the repository and navigate to the directory containing the [`setup.py`](setup.py) file.
 
 ```bash
-pip install requests matrix-commander
+pip install .
 ```
 
-## Without E2E
+### Check Installation
 
-```python
-USE_E2E = False
+```bash
+pip list
 ```
 
-Sending **unencrypted** messages to an **encrypted**/**unencrypted** room.
-
-![Example without E2E](/images/example_without_e2e.png)
-
-### Requirements
-
-|                | example / additional information                                                                                                                                                                                          |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| homeserver url | E.g. for a standard Matrix user `https://matrix-client.matrix.org` (available in _account_ settings)                                                                                                                      |
-| access token   | To get it in [Element](https://element.io/), log in as the created user, tap on the profile picture on the top left, and go to `All settings` → `Help & About`. There should be a dropdown menu on the bottom (`Access Token`) |
-| room id        | **You have to join** with this special account to **this room** before! (available in _room_ settings)                                                                                                                    |
+```bash
+pip show matrix-notify
+```
 
 ### Usage
 
-The following must be adjusted in the code:
+#### Python
 
 ```python
-MATRIX_ACCESS_TOKEN = ""
-MATRIX_ROOM_ID = ""
+#!/usr/bin/env python3
+
+import matrix_notify as mn
+
+def main():
+    notifier = mn.MatrixNotifier(
+        room_id="!your_room_id:your_homeserver",
+        #access_token="your_access_token",                  # Neccessary if using not E2E
+        #homeserver_url=mn.DEFAULT_MATRIX_HOMESERVER_URL,   # Neccessary if using not E2E
+    )
+
+    # Your logic here
+    # ...
+
+    notifier.send("Hello World", True)
+
+if __name__ == "__main__":
+    main()
 ```
 
-If necessary also:
+#### Command Line
 
-```python
-MATRIX_HOMESERVER_URL = "https://matrix-client.matrix.org"
+```plain
+usage: matrix-notify [-h] [--use-e2e USE_E2E] --message MESSAGE --room-id ROOM_ID [--homeserver-url HOMESERVER_URL]
+                     [--access-token ACCESS_TOKEN]
+
+Send a message to a Matrix room, optionally with end-to-end encryption. For more information, especially on the use of end-to-end
+encryption, see: https://github.com/fuchs-fabian/matrix-notify-py
+
+options:
+  -h, --help            show this help message and exit
+  --use-e2e USE_E2E     Use end-to-end encryption for sending messages. (case-insensitive, Default: 'False')
+  --message MESSAGE     The message to send to the Matrix room.
+  --room-id ROOM_ID     Matrix room ID. (Something like '!xyz:matrix.org')
+  --homeserver-url HOMESERVER_URL
+                        Not necessary if '--use-e2e' is unused or set to 'False'. Matrix homeserver URL. (Default:
+                        'https://matrix-client.matrix.org')
+  --access-token ACCESS_TOKEN
+                        Not necessary if '--use-e2e' is unused or set to 'False'. Matrix access token.
 ```
 
-## With E2E
+### Notes
 
-```python
-USE_E2E = True
-```
+`room_id`: **You have to join** with this special account (hereinafter referred to as **bot account**) to **this room** before! (available in _room_ settings)
 
-Sending **encryptet** messages to an **encrypted** room.
+#### Not using End-to-End Encryption (E2E)
 
-![Example with E2E](/images/example_with_e2e.png)
+| Attribute        | example / additional information                                                                                                                                                                                                           |
+|------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `access_token`   | To get it in [Element](https://element.io/) for example, log in as the bot account, tap on the profile picture on the top left, and go to `All settings` → `Help & About`. There should be a dropdown menu on the bottom (`Access Token`)  |
+| `homeserver_url` | E.g. for a standard Matrix user `https://matrix-client.matrix.org` (available in _account_ settings)                                                                                                                                       |
 
-> No 100% guarantee that it will work straight away.
-
-### Requirements
-
-- Python 3.10+
-- [`matrix-commander`](https://github.com/8go/matrix-commander/tree/master)
-
-|         | example / additional information                                                                       |
-| ------- | ------------------------------------------------------------------------------------------------------ |
-| room id | **You have to join** with this special account to **this room** before! (available in _room_ settings) |
+#### Using End-to-End Encryption (E2E)
 
 If you want to use E2E without carrying out the following steps, you will receive the following error messages:
 
-```
+```plain
 ERROR: matrix-commander: E153: Credentials file was not found. Provide credentials file or use --login to create a credentials file.
 INFO: matrix-commander: 1 error and 0 warnings occurred.
-Failed to send message (with E2E). Error: Command '['matrix-commander', '--room', '!xyz:matrix.org', '-m', '<b>Hello World!</b>', '--html']' returned non-zero exit status 1.
 ```
 
-#### `matrix-commander` parameters
+##### [`matrix-commander`](https://github.com/8go/matrix-commander/tree/master) parameters
 
-| parameter      | description                         | example                          |
-| -------------- | ----------------------------------- | -------------------------------- |
-| `device`       | name for the sending device         | matrix-commander-notifier        |
-| `user-login`   | your username                       | @test:matrix.org                 |
-| `password`     | login password for your bot account |                                  |
-| `homeserver`   | homeserver of your bot account      | https://matrix-client.matrix.org |
-| `room-default` | room id                             | !xyz:matrix.org                  |
+| parameter      | description                         | example                            |
+|----------------|-------------------------------------|------------------------------------|
+| `device`       | name for the sending device         | `matrix-commander-notifier`        |
+| `user-login`   | your username                       | `@test:matrix.org`                 |
+| `password`     | login password for your bot account |                                    |
+| `homeserver`   | homeserver of your bot account      | `https://matrix-client.matrix.org` |
+| `room-default` | room id                             | `!xyz:matrix.org`                  |
 
-#### Installation
+##### Setup
 
 A credentials file must be created for the `matrix-commander`. To do this, execute the following:
 
-```bash
+```plain
 matrix-commander --login PASSWORD --device 'REPLACE-ME' --user-login 'REPLACE-ME' --password 'REPLACE-ME' --homeserver 'REPLACE-ME' --room-default 'REPLACE-ME'
 ```
 
-> You have to replace all `REPLACE-ME` with your own credentials!
+**You have to replace all `REPLACE-ME` with your own credentials!**
+
+- To avoid mysterious errors, it is recommended to move the `credentials.json` file to the directory `$HOME/.config/matrix-commander/`.
+- Also create a storage directory: `$HOME/.local/share/matrix-commander/store/`
+
+(Reference: [matrix-commander](https://github.com/8go/matrix-commander/tree/master?tab=readme-ov-file#first-run-set-up-credentials-file-end-to-end-encryption))
 
 To verify a room session, once you have been invited and accepted into the room, you will need to go to the bot account in the room settings with the account you want to receive the encrypted messages with and verify the current session using emojis.
 
-In this case, it is better to start from an [Element](https://element.io/) room of the account with which you want to receive the encrypted messages, for example.
+In this case, it is better to start from a Matrix room of the account with which you want to receive the encrypted messages, for example.
 
 To verify a session immediately, send a message directly to a room:
 
-```bash
+```plain
 matrix-commander --room 'REPLACE-ME' -m 'First encrypted message :)'
 ```
 
 Therefore:
 
-```bash
+```plain
 matrix-commander --verify emoji
 ```
 
-> If you do not perform this step, the messages will be sent encrypted, but the session will not be verified and a warning will be displayed along with the message in messenger.
+**If you do not perform this step, the messages will be sent encrypted, but the session will not be verified and a warning will be displayed along with the message in messenger.**
 
-## Test and try with [Conda](https://docs.conda.io/en/latest/)
-
-```bash
-conda create --name matrix_env python=3.10
-```
+### Uninstall
 
 ```bash
-conda activate matrix_env
+pip uninstall matrix-notify
 ```
 
-Update Python:
+## Bugs, Suggestions, Feedback, and Needed Support
 
-```bash
-conda update python
-```
+> If you have any bugs, suggestions or feedback, feel free to create an issue or create a pull request with your changes.
 
-(Upgrade Python:)
+## Support Me
 
-```bash
-conda upgrade python
-```
+If you like `matrix-notify`, you think it is useful and saves you a lot of work and nerves and lets you sleep better, please give it a star and consider donating.
 
-Run [`matrix.py`](./matrix.py):
-
-```bash
-python3 matrix.py
-```
-
-## Repository that uses this template
-
-- [Checkmk-Matrix-Notifications](https://github.com/fuchs-fabian/Checkmk-Matrix-Notifications)
+<a href="https://www.paypal.com/donate/?hosted_button_id=4G9X8TDNYYNKG" target="_blank">
+  <!--
+    https://github.com/stefan-niedermann/paypal-donate-button
+  -->
+  <img src="https://raw.githubusercontent.com/stefan-niedermann/paypal-donate-button/master/paypal-donate-button.png" style="height: 90px; width: 217px;" alt="Donate with PayPal"/>
+</a>
