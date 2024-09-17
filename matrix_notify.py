@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+from enum import Enum
 import json
 import re
 import requests # type: ignore
@@ -161,6 +162,131 @@ class MatrixNotifier:
         except Exception as e:
             print(f"An error occurred while sending the message '{message}' to room '{self.room_id}' ({'with' if use_e2e else 'without'} E2E):\n{e}")
             sys.exit(1)
+
+class Helper:
+    '''
+    A helper class for various tasks.
+    '''
+    class HTML:
+        '''
+        A helper class for HTML-related tasks. This makes it easier to format messages for Matrix.
+        '''
+        class Tags(Enum):
+            '''
+            Enum for HTML tags.
+
+            Attributes:
+                H1 (str):
+                    `h1` (HTML: `<h1>...</h1>`).
+                H2 (str):
+                    `h2` (HTML: `<h2>...</h2>`).
+                H3 (str):
+                    `h3` (HTML: `<h3>...</h3>`).
+                H4 (str):
+                    `h4` (HTML: `<h4>...</h4>`).
+                PARAGRAPH (str):
+                    `p` (HTML: `<p>...</p>`).
+                CODE (str):
+                    `code` (HTML: `<pre><code>...</code></pre>`).
+                BOLD (str):
+                    `strong` (HTML: `<strong>...</strong>`).
+                ITALIC (str):
+                    `em` (HTML: `<em>...</em>`).
+
+            ## Notes
+
+            - `format`: Formats the content with the corresponding tag.
+            - `replace_new_lines`: Replaces new lines with `<br>`.
+            - `replace_spaces`: Replaces spaces with `&nbsp;`.
+            - `replace_spaces_and_new_lines`: Replaces spaces and new lines with `<br>` and `&nbsp;` respectively.
+            '''
+            H1 = "h1"
+            H2 = "h2"
+            H3 = "h3"
+            H4 = "h4"
+            PARAGRAPH = "p"
+            CODE = "code"
+            BOLD = "strong"
+            ITALIC = "em"
+
+            def format(self, content: str) -> str:
+                '''
+                Formats the content with the corresponding tag.
+
+                Args:
+                    content (str): The content to format.
+
+                Returns:
+                    str: The formatted content.
+                
+                Example:
+                    >>> Helper.HTML.Tags.H1.format("Hello, world!")
+                    <h1>Hello, world!</h1>
+                '''
+                try:
+                    if self == Helper.HTML.Tags.H1:
+                        return f"<h1>{content}</h1>"
+                    elif self == Helper.HTML.Tags.H2:
+                        return f"<h2>{content}</h2>"
+                    elif self == Helper.HTML.Tags.H3:
+                        return f"<h3>{content}</h3>"
+                    elif self == Helper.HTML.Tags.H4:
+                        return f"<h4>{content}</h4>"
+                    elif self == Helper.HTML.Tags.PARAGRAPH:
+                        return f"<p>{content}</p>"
+                    elif self == Helper.HTML.Tags.CODE:
+                        return f"<pre><code>{content}</code></pre>"
+                    elif self == Helper.HTML.Tags.BOLD:
+                        return f"<strong>{content}</strong>"
+                    elif self == Helper.HTML.Tags.ITALIC:
+                        return f"<em>{content}</em>"
+                    else:
+                        raise ValueError(f"Unsupported tag '{self}'")
+                except ValueError as ve:
+                    print(f"'ValueError' in 'Helper.HTML.Tags.format': {ve}")
+                    return content
+                except Exception as e:
+                    print(f"An unexpected error occurred in 'Helper.HTML.Tags.format': {e}")
+                    return content
+
+        @staticmethod
+        def replace_new_lines(content: str) -> str:
+            '''
+            Replaces new lines with `<br>`.
+
+            Args:
+                content (str): The content to replace new lines in.
+            
+            Returns:
+                str: The content with new lines replaced with `<br>`.
+            '''
+            return content.replace("\n", "<br>")
+
+        @staticmethod
+        def replace_spaces(content: str) -> str:
+            '''
+            Replaces spaces with `&nbsp;`.
+
+            Args:
+                content (str): The content to replace spaces in.
+
+            Returns:
+                str: The content with spaces replaced with `&nbsp;`.
+            '''
+            return content.replace(" ", '&nbsp;')
+
+        @staticmethod
+        def replace_spaces_and_new_lines(content: str) -> str:
+            '''
+            Replaces spaces and new lines with `<br>` and `&nbsp;` respectively.
+
+            Args:
+                content (str): The content to replace spaces and new lines in.
+
+            Returns:
+                str: The content with spaces replaced with `&nbsp;` and new lines replaced with `<br>`.
+            '''
+            return Helper.HTML.replace_new_lines(Helper.HTML.replace_spaces(content))
 
 def _process_arguments() -> argparse.Namespace:
     note_for_e2e = "Not necessary if '--use-e2e' is unused or set to 'False'."

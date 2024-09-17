@@ -70,8 +70,11 @@ def main():
 
     # Your logic here
     # ...
+    # e.g.
+    message = mn.Helper.HTML.Tags.H1.format("Hello World")
+    message = mn.Helper.HTML.replace_spaces(message)
 
-    notifier.send("Hello World", True)
+    notifier.send(message, True)
 
 if __name__ == "__main__":
     main()

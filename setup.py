@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name='matrix-notify',
-    version='1.0.0',
+    version='1.1.0',
     description='Send matrix messages to a room.',
     long_description='Import this Python package to send messages to a matrix room, optionally with end-to-end encryption.',
     author='Fabian Fuchs',
