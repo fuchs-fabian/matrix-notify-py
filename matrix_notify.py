@@ -171,7 +171,7 @@ class Helper:
         '''
         A helper class for HTML-related tasks. This makes it easier to format messages for Matrix.
         '''
-        class Tags(Enum):
+        class Tag(Enum):
             '''
             Enum for HTML tags.
 
@@ -220,33 +220,33 @@ class Helper:
                     str: The formatted content.
                 
                 Example:
-                    >>> Helper.HTML.Tags.H1.format("Hello, world!")
+                    >>> Helper.HTML.Tag.H1.format("Hello, world!")
                     <h1>Hello, world!</h1>
                 '''
                 try:
-                    if self == Helper.HTML.Tags.H1:
+                    if self == Helper.HTML.Tag.H1:
                         return f"<h1>{content}</h1>"
-                    elif self == Helper.HTML.Tags.H2:
+                    elif self == Helper.HTML.Tag.H2:
                         return f"<h2>{content}</h2>"
-                    elif self == Helper.HTML.Tags.H3:
+                    elif self == Helper.HTML.Tag.H3:
                         return f"<h3>{content}</h3>"
-                    elif self == Helper.HTML.Tags.H4:
+                    elif self == Helper.HTML.Tag.H4:
                         return f"<h4>{content}</h4>"
-                    elif self == Helper.HTML.Tags.PARAGRAPH:
+                    elif self == Helper.HTML.Tag.PARAGRAPH:
                         return f"<p>{content}</p>"
-                    elif self == Helper.HTML.Tags.CODE:
+                    elif self == Helper.HTML.Tag.CODE:
                         return f"<pre><code>{content}</code></pre>"
-                    elif self == Helper.HTML.Tags.BOLD:
+                    elif self == Helper.HTML.Tag.BOLD:
                         return f"<strong>{content}</strong>"
-                    elif self == Helper.HTML.Tags.ITALIC:
+                    elif self == Helper.HTML.Tag.ITALIC:
                         return f"<em>{content}</em>"
                     else:
                         raise ValueError(f"Unsupported tag '{self}'")
                 except ValueError as ve:
-                    print(f"'ValueError' in 'Helper.HTML.Tags.format': {ve}")
+                    print(f"'ValueError' in 'format': {ve}")
                     return content
                 except Exception as e:
-                    print(f"An unexpected error occurred in 'Helper.HTML.Tags.format': {e}")
+                    print(f"An unexpected error occurred in 'format': {e}")
                     return content
 
         @staticmethod
