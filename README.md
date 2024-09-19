@@ -71,7 +71,7 @@ def main():
     # Your logic here
     # ...
     # e.g.
-    message = mn.Helper.HTML.Tags.H1.format("Hello World")
+    message = mn.Helper.HTML.Tag.H1.format("Hello World")
     message = mn.Helper.HTML.replace_spaces(message)
 
     notifier.send(message, True)
